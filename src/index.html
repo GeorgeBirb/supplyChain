@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Supply Chain Results</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #candidatesSelect {
+            width: fit-content;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form onSubmit="App.addProduct($('#newProductInput').val()); return false;">
+                    <div class="form-group">
+                        <label for="newProductInput">Product Name</label>
+                        <input type="text" class="form-control" id="newProductInput" placeholder="Enter product name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="updateProductModal" tabindex="-1" role="dialog" aria-labelledby="updateProductModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateProductModalLabel">Update Values</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            <form
+                onSubmit="App.setValues($('#productInput').val(),$('#amountInput').val(),$('#departureDate').val(),$('#arrivalDate').val(), $('#descriptionInput').val()); return false;"
+                class="centered" id="datesAmounDescription">
+                <div class="form-group">
+                    <label id="productLabel" for="productInput">Update Product</label>
+                        <select class="form-control" id="productSelect"><option value="">Select a product</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="amountInput">Update Amount</label>
+                    <input type="text" class="form-control" id="amountInput" placeholder="Update Amount">
+                </div>
+                <div class="form-group">
+                    <label for="departureInput">Update Departure</label>
+                    <input type="text" class="form-control" id="departureInput" placeholder="Update Departure">
+                </div>
+                <div class="form-group">
+                    <label for="arrivalInput">Update Arrival</label>
+                    <input type="text" class="form-control" id="arrivalInput" placeholder="Update Arrival">
+                </div>
+                <div class="form-group">
+                    <label for="descriptionInput">Update Description</label>
+                    <input type="text" class="form-control" id="descriptionInput" placeholder="Update Description">
+                </div>
+                <button type="submit" class="btn btn-primary">Set Product Values</button>
+                <hr/>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <h1>Supply Chain Results</h1>
+            <hr/>
+            <button type="button" id ="insertProductButton" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">Add New Product</button>
+            <hr/>
+            <br/>
+            <div id="loader">
+                <p>Loading...</p>
+            </div>
+            <div class="centered">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="centered-header">CandidateId</th>
+                        <th scope="col" class="text-center">Address</th>
+                        <th scope="col" class="text-center">ChainSeqNo</th>
+                        <th scope="col" class="text-center">isOwner</th>
+                    </tr>
+                    </thead>
+                    <tbody id="candidatesResults">
+                    </tbody>
+                </table>
+            </div>
+            <hr/>
+            <div class="centered">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="centered-header">TransferId</th>
+                        <th scope="col" class="text-center">Origin</th>
+                        <th scope="col" class="text-center">Destination</th>
+                        <th scope="col" class="text-center">Product</th>
+                        <th scope="col" class="text-center">Amount</th>
+                        <th scope="col" class="text-center">DepartureDate</th>
+                        <th scope="col" class="text-center">ArrivalDate</th>
+                        <th scope="col" class="text-center">Description</th>
+                    </tr>
+                    </thead>
+                    <tbody id="transferResults">
+                    </tbody>
+                </table>
+            </div>
+
+            <hr/>
+
+           <div class="centered">
+           <button type="button" id="updateBtn" class="btn btn-primary" data-toggle="modal" data-target="#updateProductModal">Set Product Values
+           </button>
+           </div>
+
+            <form onSubmit="return showConfirmationDialog();" id="transferForm" class="centered">
+                <div class="form-group">
+                    <label for="candidatesSelect">Select id of the new Owner</label>
+                    <select class="form-control" id="candidatesSelect"></select>
+                </div>
+                <button type="submit" class="btn btn-primary">Transfer</button>
+                <hr/>
+            </form>
+            <p id="accountAddress" class="text-center"></p>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@truffle/contract/dist/truffle-contract.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+    function showConfirmationDialog() {
+    var confirmation = window.confirm("Are you sure you want to proceed with the transfer? It will cost you some ETH!");
+    if (confirmation) {
+    App.castTransfer();
+    return false;
+} else {
+    return true;
+}
+}
+</script>
+</body>
+</html>
